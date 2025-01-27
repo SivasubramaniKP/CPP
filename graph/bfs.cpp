@@ -33,7 +33,7 @@ class Graph {
             if ( u > 0 && u <= nV && v > 0 && v <= nV ) {
                 List[u-1].push_back(v-1);
                 // Add the following line for undirected graph
-                // List[v-1].push_back(u-1);
+                List[v-1].push_back(u-1);
                 //This line suggests that the edge is bidirectional
             }
         } 
@@ -257,6 +257,7 @@ class Graph {
 
     void checkCycle() {
         // Function to print if there is a cycle in the graph
+        // Topological Sort Method
         /*
             There is no Cycle in the graph if there is a valid topological ordering
             cuz we know that topological sort only works on Directed ACYCLIC Graphs
@@ -273,33 +274,110 @@ class Graph {
        int Visited = 0;
        std::queue<int> queue;
        std::vector<int> indegree(nV, 0);
-        for ( int i = 0 ; i < nV; i++ ) {
-            for ( int neighbours : List[i] ) {
-                indegree[neighbours]++;
+
+       // Find the indegree of each node 
+
+       // let take example of graph
+       // 1 - 2 - 3 - 4
+       // An acyclic graph
+        for ( int i = 0 ; i < nV; i++ ) {       // For i = 0
+            for ( int neighbours : List[i] ) {  // neighbours will iterate over 1
+                indegree[neighbours]++;         // Indegree of 1 will increase
             }
         }
 
+        // Topological sort starts with the vertex with indegree of zero.
+        // So find the vertices with indegree of zero
         for ( int i = 0; i < nV; i++ ) {
             if ( indegree[i] == 0 ) {
                 queue.push(i);
             }
         }
 
+    
         while ( !queue.empty() ) {
             int node = queue.front();
             queue.pop();
-            Visited++;
+            Visited++;              // Mark the Vertex as visited
 
-            for ( int v : List[node] ) {
+            for ( int v : List[node] ) {     //  Update the indegree of its neighbouring vertices. i.e., when 1 completes
+                                            // We should update the indegree of 2 since it decreases by 1 
                 indegree[v]--;
-                if ( indegree[v] == 0 ) {
+                if ( indegree[v] == 0 ) {   // If the update vertex's indegree become zero add it to the queue
                     queue.push(v);
                 }
             }
         }  
 
+
+        // If topological sort is successful, then all vertices would have  been visited So 
+        // by definintion of a DAG, the given graph is acyclic 
         if ( Visited == nV ) std::cout << "No cycles";
         else std::cout << "Cycles";
+
+    }
+
+    void checkCycle_Undirected() {
+
+        // The function checks whether the given non directional - graph has a cycle
+        /*
+            The main idea revolves around BFS Traversal 
+            1. Perform normal BFS traversal
+            2. Start with any vertex as source
+            3. Visit the neighbour of the current vertex
+            4. If the vertex is already visited, then it implies that there is another path by which  the BFS traversal has already visited this edge.
+                So there is  a cycle
+
+            Example :
+                1 - 2
+                |   |
+                3 - 4
+
+                In BFS(1) -> we visit 2 and 3
+                in BFS(2) -> we visit 4 and 1
+                            1 is the parent, we shouldnt take the edge to the parent as a cycle
+                in BFS(3) -> we visit 4 and 1
+                            Since 4 is already visited(through 1 - 2 - 4), ITS A CYCLE 
+        */
+        std::vector<int> Visited(nV, 0);
+        std::queue<std::pair<int, int>> Q;
+        // The algorithm is Very similar to BFS 
+        /*
+            Instead of Storing only the vertices the vertices in the Queue
+            we need to store the node along with its parent to distinguishing
+                Example :
+                   1 - 2 - 3
+
+                   adjacency list representation 
+                   1 : 2 
+                   2 : 1, 3
+                   3 : 2
+
+                   There is an edge from 1 to 2 also 2 to 1 cuz its an non directional graph
+                    BUt we should not consider this as graph
+
+                So we should ignore 1(the parent of 2)
+        */
+        Q.push({0, -1});
+        // 0 is the vertex -1 is the parent
+        Visited[0] = 1;
+
+        while ( !Q.empty() ) {
+            int node = Q.front().first;
+            int parent = Q.front().second;
+            Q.pop();
+
+            for ( int neighbour : List[node] ) {  // Iterate over the neighbours of the node
+                if ( !Visited[neighbour] ) {
+                    Visited[neighbour] = 1;      // If its not visited, add it to the queue
+                    Q.push({neighbour, node});
+                } else if ( neighbour != parent ) {        // IMPORATANT PART of the algorithm Explained above
+                    std::cout << "Presence of Cycle";
+                    return ;
+                }
+            }
+        }
+        std::cout << "No cycles";
 
     }
 
@@ -317,10 +395,11 @@ class Graph {
 };
 
 int main () {
-    Graph * graph = new Graph(3,4);
+    Graph * graph = new Graph(4,4);
     // graph->printAdjacencyList();
     // graph->findShortestDistance(6, 5);
     // graph->findNumberOfComponents();
-    graph->checkCycle();
+    // graph->checkCycle();
+    graph->checkCycle_Undirected();
     return 0;
-}
+} 
