@@ -8,20 +8,18 @@ class Graph {
                 std::vector<std::vector<int>> list;
                 int nVertices;
                 int nEdges;
-        Graph(int nVertices) {
+        Graph(int nVertices, int NEdges) {
                 this->nVertices = nVertices;
+                this->nEdges = NEdges;
                 list.resize(nVertices);
         }
         void inputGraph() {
-                int nEdges;
-                std::cout << "Enter the number of edges pls" << std::endl;
-                std::cin >> this->nEdges;
                 std::cout << "Enter the edge in this format" << std::endl;
                 for ( int i = 0 ; i < this->nEdges; i++ ) {
                         int u, v;
                         std::cin >> u >> v;
                         list[u - 1].push_back(v - 1);
-                        list[v - 1].push_back(u - 1);
+                        //list[v - 1].push_back(u - 1);
                 }
         }
         void displayGraph () {
@@ -33,54 +31,65 @@ class Graph {
                         std::cout << "\n";
                 }  
         }
-        std::vector<std::vector<int>> BFS ( int start ) {
-                std::vector<bool> visited(nVertices, false);
-                std::queue<int> q;
-                
-               std::vector<std::vector<int>> levels;
-               visited[start] = true;
-               q.push(start);
-
-               while (!q.empty()) {
-                int levelSize = q.size();
-                std::vector<int> level;
-                
-                for ( int i = 0; i < levelSize; i++ ) {
-                        int node = q.front();
-
-                        q.pop();
-                        level.push_back(node);
-                        for ( int neighbour : list[node] ) {
-                                if ( !visited[neighbour] ) {
-                                        visited[neighbour] = true;
-                                        q.push(neighbour);
-
+        std::vector<int> inDegree() {
+                std::vector<int> res(nVertices, 0);
+                for ( int i = 0 ; i < nVertices; i++ ) {
+                        for ( std::vector<int> v : list ) {
+                                for ( int neighbours : v ) {
+                                        if ( neighbours == i ) res[i]++;
                                 }
                         }
                 }
-                levels.push_back(level);
-               }
-                return levels;
+                return res;
         }
+
+        std::vector<int> outDegree() {
+                std::vector<int> res(nVertices, 0);
+                for ( int i = 0 ; i < nVertices; i++ ) {
+                        res[i] = list[i].size();
+                }  
+                return res;
+        }
+        
 };
 
-void printLevels ( std::vector<std::vector<int>> Levels ) {
-        for ( std::vector<int> rows : Levels ) {
-                std::cout << "[ ";
-                for ( int items : rows ) {
-                        std:: cout << items + 1 << ", ";
-                }
-                std::cout << "]\n"; 
+void printList(std::vector<int> list)  {
+        for ( int i = 0 ; i < list.size(); i++ ) {
+                std::cout << i << ": " << list[i] << "\n";
         }
-} 
+}
 
 int main () {
-        int nV;
+
+        int nE, nV;
+        std::cout << "Input the graph\n";
+        std::cout << "Enter the number of vertices";
         std::cin >> nV;
-        Graph graph(nV);
-        graph.inputGraph();
-        graph.displayGraph();
-        std::vector<std::vector<int>> levels = graph.BFS(1);
-        printLevels(levels);
+        std::cout << "Enter the number of edges";
+        std::cin >> nE;
+
+        Graph * graph = new Graph(nV, nE);
+        graph->inputGraph();
+        std::cout << "Enter 1 to find the Indegree 2 to find the outdegree 3 to print the adjecency list";
+        int ch;
+        std::cin >> ch;
+        while ( true ) {
+                switch(ch) {
+                        case 1:{
+                                printList(graph->inDegree());
+                                break;
+                        }
+                        case 2:{
+                                printList(graph->outDegree());
+                                break;
+                        } case 3:{ 
+                                graph->displayGraph();
+                                break;
+                        }
+                }
+
+                std::cout << "Enter 1 to find the Indegree 2 to find the outdegree 3 to print the adjecency list";
+                std::cin >> ch;
+        }
         return 0;
 }
