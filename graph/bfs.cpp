@@ -33,7 +33,7 @@ class Graph {
             if ( u > 0 && u <= nV && v > 0 && v <= nV ) {
                 List[u-1].push_back(v-1);
                 // Add the following line for undirected graph
-                List[v-1].push_back(u-1);
+                // List[v-1].push_back(u-1);
                 //This line suggests that the edge is bidirectional
             }
         } 
@@ -255,6 +255,54 @@ class Graph {
     }
     }
 
+    void checkCycle() {
+        // Function to print if there is a cycle in the graph
+        /*
+            There is no Cycle in the graph if there is a valid topological ordering
+            cuz we know that topological sort only works on Directed ACYCLIC Graphs
+
+            1. Find the indegree of all the nodes
+            2. Push the vertices that have indegree of zero to a queue
+            3. till Queue is empty
+                i. dequeue to get the vertex with indegree of 0
+                ii. Reduce the indegree of its neighbours by 1.
+                iii. If some of the neighbour's indegree becomes zero, add it to the queue
+                iv. Repeat
+            4. If all vertices are visited, then no cycle
+        */
+       int Visited = 0;
+       std::queue<int> queue;
+       std::vector<int> indegree(nV, 0);
+        for ( int i = 0 ; i < nV; i++ ) {
+            for ( int neighbours : List[i] ) {
+                indegree[neighbours]++;
+            }
+        }
+
+        for ( int i = 0; i < nV; i++ ) {
+            if ( indegree[i] == 0 ) {
+                queue.push(i);
+            }
+        }
+
+        while ( !queue.empty() ) {
+            int node = queue.front();
+            queue.pop();
+            Visited++;
+
+            for ( int v : List[node] ) {
+                indegree[v]--;
+                if ( indegree[v] == 0 ) {
+                    queue.push(v);
+                }
+            }
+        }  
+
+        if ( Visited == nV ) std::cout << "No cycles";
+        else std::cout << "Cycles";
+
+    }
+
     void printAdjacencyList() {
         // Just a helper functiion to visualize the adjacency list
 
@@ -269,9 +317,10 @@ class Graph {
 };
 
 int main () {
-    Graph * graph = new Graph(8,10);
+    Graph * graph = new Graph(3,4);
     // graph->printAdjacencyList();
     // graph->findShortestDistance(6, 5);
-    graph->findNumberOfComponents();
+    // graph->findNumberOfComponents();
+    graph->checkCycle();
     return 0;
 }
