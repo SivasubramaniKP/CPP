@@ -354,7 +354,7 @@ class Graph {
                    3 : 2
 
                    There is an edge from 1 to 2 also 2 to 1 cuz its an non directional graph
-                    BUt we should not consider this as graph
+                    BUt we should not consider this as cycle
 
                 So we should ignore 1(the parent of 2)
         */
