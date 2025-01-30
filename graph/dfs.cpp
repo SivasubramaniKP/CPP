@@ -104,10 +104,44 @@ class Graph {
              std::cout << i.first.first + 1 << "->" << i.first.second + 1 << " : " << i.second << std::endl;
         }
     }
+    private:
+        void resetVisited() {
+            for ( int i = 0 ; i < nV; i++ ) Visited[i] = 0;
+        }
+    std::vector<int> RecStack;
+    public:
+    void checkCycle() {
+        resetVisited();
+        RecStack.assign(nV, 0);
 
+        for ( int i = 0; i < nV; i++ ) {
+            if ( !Visited[i] ) {
+                if (checkCycleHelper(i)) {
+                    std::cout << "Cycle detected" << std::endl;
+                    return;
+                }
+            }
+        }
+        std::cout << "No cycles \n";
+    }
+    private:
+    bool checkCycleHelper(int vertex) {
+        Visited[vertex] = 1;
+        RecStack[vertex] = 1;
+        for ( int neighbour : List[vertex] ) {
+            if ( !Visited[neighbour] ) {
+                if ( checkCycleHelper(neighbour) ) return true;
+            } else if (RecStack[neighbour]){
+                return true;
+            }
+        }
+        RecStack[vertex] = 0;
+        return false;
+    }
 };
 
 int main () {
-    Graph * graph = new Graph(6,4);
-    graph->CategoriseEdges();
+    Graph * graph = new Graph(3,4);
+    // graph->CategoriseEdges();
+    graph->checkCycle();
 }
