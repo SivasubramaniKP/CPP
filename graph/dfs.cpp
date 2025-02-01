@@ -29,6 +29,9 @@ class Graph {
         List.resize(nV);        
         Visited.resize(nV, 0);
         this->Time = 0;
+        
+    }
+    void inputGraph () {
         std::cout << "Enter the edges in this format 'vertex1 vertex2'" << std::endl;
         // To denote an edge from vertex 1 to 5
         // input
@@ -45,7 +48,6 @@ class Graph {
             }
         } 
     }
-
     void DFS(int vertex) {
         Visited[vertex] = true;        
         Start[vertex] = Time++;
@@ -130,7 +132,6 @@ class Graph {
         RecStack[vertex] = 1;
         for ( int neighbour : List[vertex] ) {
             if ( !Visited[neighbour] ) {
-                if ( checkCycleHelper(neighbour) ) return true;
             } else if (RecStack[neighbour]){
                 return true;
             }
@@ -138,10 +139,87 @@ class Graph {
         RecStack[vertex] = 0;
         return false;
     }
+
+    // Strongly Connected Components:
+    /*
+        1. Run DFS and number the vertices.
+        2. Arrange the vertices in descending order of finishing time
+        3. Run DFS on the vertex with maximum finishing time
+        3. Transpose the graph
+        5. The vertices covered by the DFS forms a strongly connected components
+        6. Run DFS until all vertices are covered.
+    */
+
+    /*
+        function returns the list of strongly connected components
+        Component 1 : 1,2,3
+        Component 2 : 5,6
+        Component 3 : 4
+    */
+   public: 
+   void SCC() {
+    resetVisited();
+    runDFS();
+    std::vector<std::pair<int, int>> timePair;
+    for ( int i = 0 ; i < nV ; i++ ) {
+        timePair.push_back({i, Finish[i]});
+    }   
+    for ( int i = 0 ; i < nV - 1; i++ ) {
+       for ( int j = 0 ; j < nV - i - 1; j++ ) {
+        if ( timePair[j].second < timePair[j + 1].second ) {
+            std::pair<int, int> temp = timePair[j];
+            timePair[j] = timePair[j+1];
+            timePair[j+1] = temp;
+        }
+       } 
+    }
+
+   Graph * transposeGraph = new Graph(nE, nV);
+    for ( int u = 0 ; u < nV; u++) {
+        for ( int v : List[u] ) {
+            transposeGraph->List[v].push_back(u);
+        }
+    }
+
+    std::vector<std::vector<int>> res =  transposeGraph->SCCDFS();
+    for ( int i = 0 ; i < res.size(); i++ ) {
+        std:: cout << "cOmponent " << i <<" : ";
+        for ( int j : res[i] ) {
+            std::cout << j + 1 << " ";
+        }
+        std::cout << "\n";
+    }
+   }
+
+    private:
+        std::vector<std::vector<int>> SCCDFS() {
+            std::vector<std::vector<int>> res;
+            for ( int i = 0 ; i < nV; i++ ) {
+                
+                if ( !Visited[i] ) {
+                    std::vector<int> temp;
+                    SCCDFSHelper(i, temp);
+                    res.push_back(temp);
+                }
+            }
+            return res;
+        }
+
+        void SCCDFSHelper(int vertex, std::vector<int>&temp) {
+            Visited[vertex] = true;
+            temp.push_back(vertex);
+            for ( int v : List[vertex] ) {
+                if ( !Visited[v] ) {
+                    SCCDFSHelper(v, temp);
+                }
+            }    
+        } 
 };
 
 int main () {
-    Graph * graph = new Graph(3,4);
+    Graph * graph = new Graph(9,8);
+    graph->inputGraph();
     // graph->CategoriseEdges();
-    graph->checkCycle();
+    graph->SCC();
+   
 }
