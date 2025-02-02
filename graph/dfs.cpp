@@ -1,6 +1,7 @@
 #include <iostream>
+#include <stack>
 #include <vector>
-
+#include <queue>
 class Graph {
     public:
     int nE; // Number of edges
@@ -21,9 +22,9 @@ class Graph {
     Graph ( int nE, int nV ) {
         this->nE = nE;
         this->nV = nV;
-        Parent.resize(nV, -1);
-        Distance.resize(nV, 2147483647);
-        Start.resize(nV, 0);
+        Parent.resize(nV, -1); // Setting the parent of node to be unknown
+        Distance.resize(nV, 2147483647); // Setting distance to Infinity cuz we dont know if the vertex are connected initially
+        Start.resize(nV, 0); // Start and finishing times
         Finish.resize(nV, 0);
         // Lets input the edges and store it in the list
         List.resize(nV);        
@@ -49,6 +50,10 @@ class Graph {
         } 
     }
     void DFS(int vertex) {
+        /*
+            DFS(int vertex) is the utility function for runDFS()
+            Recursively calls itself if the neighbours the vertex are not visited
+        */
         Visited[vertex] = true;        
         Start[vertex] = Time++;
         for ( int i : List[vertex] ) {
@@ -62,6 +67,10 @@ class Graph {
     }
     
     void runDFS() {
+        /*
+            Main DFS() function :
+            runs DFS on every  vertices and update the parent and distance values
+        */
         for ( int i = 0 ; i < nV; i++ ) {
             if( !Visited[i] ) {
                 Parent[i] = -1;
@@ -87,10 +96,53 @@ class Graph {
     }
 
     void CategoriseEdges() {
+
+        /*
+            The function categorises the edges
+            1. tree edge 
+            2. Non tree edge
+                i. Forward edge
+                ii. Backward edge
+                iii. Cross edge
+        */
         runDFS();
+
         std::vector<std::pair<std::pair<int, int>, std::string>> Classifier;
+        /* 
+            Classifier stores the edge and its category
+            Its of the type
+            [
+                { (1,2), "Backward Edge" },
+                { (3,4), "tree edge" }
+            ]
+        */
         for ( int i = 0 ; i < nV; i++ ) {
             for ( int neighbour : List[i] ) {
+                /*
+                    One simple trick
+                    Imagine a DFS tree
+                    the vertices at the top(near the root) has lower starting time and higher finishing times
+                    closer the vertex to the root : Higher the finishing time, lower the starting times
+                    Farther the vertex from the root : Higher the starting time, lower the finishing times 
+
+                              1
+                            /   \
+                            2   5
+                           / \
+                          3  4
+
+                          1 : has the minimum starting time and maximum finishing time
+
+                        Consider the edge 1 -> 5 ( tree edge ) 
+                        1 is represented by i 
+                        5 is represented by neighbour in the code
+
+                        Start time of 1 should be smaller than 5 and also finishing time of 1 should be greater the 5
+                         -> So its a tree edge
+
+                        consider edge in the graph 3 ->1
+                        Start time of 3 is greater and finishing time of 1 is greater ( This is exactly what i written in if condition )
+                */
                 if ( Start[i] < Start[neighbour] && Finish[i] > Finish[neighbour] ) {
                     Classifier.push_back({{i,neighbour}, "tree edge"});
                 } else if ( Start[i] > Start[neighbour] && Finish[neighbour] > Finish[i] ) {
@@ -112,6 +164,16 @@ class Graph {
         }
     std::vector<int> RecStack;
     public:
+
+    /*
+        1 - 2
+        |   |
+        3 - 4
+
+        Execution :
+            checkCycle(1)
+            CheckCycle(2)
+    */
     void checkCycle() {
         resetVisited();
         RecStack.assign(nV, 0);
@@ -132,6 +194,9 @@ class Graph {
         RecStack[vertex] = 1;
         for ( int neighbour : List[vertex] ) {
             if ( !Visited[neighbour] ) {
+                if ( checkCycleHelper(neighbour) ) {
+                    return true;
+                }
             } else if (RecStack[neighbour]){
                 return true;
             }
@@ -214,12 +279,86 @@ class Graph {
                 }
             }    
         } 
+
+    public:
+        /*
+            Topological Sort...
+        */
+
+       void TopologicalSort() {
+        resetVisited();
+        std::vector<int> inDegree(nV, 0);
+        for ( int u = 0; u < nV; u++ ) {
+            for ( int v : List[u] ) {
+                inDegree[v]++;
+            }
+        }
+        std::queue<int> Q;
+        std::vector<int> res;
+        int visit = 0;
+        for ( int i = 0; i < nV ; i++ ) {
+            if ( inDegree[i] == 0 ) Q.push(i);
+        } 
+        while ( !Q.empty() ) {
+            int node = Q.front();
+            Q.pop();
+            visit++;
+            res.push_back(node);
+            for ( int v : List[node] ) {
+                inDegree[v]--;
+                if ( inDegree[v] == 0 ) Q.push(v);
+            }
+        }
+        if ( visit != nV ) {
+            std::cout << "Cycle detected \n";
+            return;
+        }   
+        for ( int i : res ) {
+            std::cout << i << " ";
+        }
+       }
+
+
+        /*
+            Topological sort using DFS
+        */
+
+       void DFStopologicalSort() {
+        resetVisited();
+        std::stack<int> res;
+        for( int i = 0; i < nV; i++ ) {
+            if ( Visited[i] == false ) {
+                DFStopologicalSortUtil(i, res);
+            }
+        }
+        std::vector<int> revStack;
+        while ( !res.empty() ) {
+            revStack.push_back(res.top());
+            res.pop();
+        }
+        for ( int i : revStack ) {
+            std::cout << i + 1 << " ";
+        }
+       }
+       private:
+        void DFStopologicalSortUtil (int vertex, std::stack<int> &res) {
+            Visited[vertex] = true;
+            for( int v : List[vertex] ) {
+                if ( !Visited[v] ) {
+                    DFStopologicalSortUtil(v, res);
+                }
+            }
+            res.push(vertex);
+        }
+
 };
 
 int main () {
-    Graph * graph = new Graph(9,8);
+    Graph * graph = new Graph(6,6);
     graph->inputGraph();
     // graph->CategoriseEdges();
-    graph->SCC();
-   
+    // graph->SCC();
+    // graph->TopologicalSort();
+   graph->DFStopologicalSort();
+
 }
