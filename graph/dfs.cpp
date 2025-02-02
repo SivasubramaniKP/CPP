@@ -171,8 +171,7 @@ class Graph {
         3 - 4
 
         Execution :
-            checkCycle(1)
-            CheckCycle(2)
+            checkCycle(1) -> CheckCycle(2) -> CheckCycle(4) -> CheckCycle(3) -> 1 is a neigbour of 3 so it returns true
     */
     void checkCycle() {
         resetVisited();
