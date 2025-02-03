@@ -54,7 +54,7 @@ class Graph {
         // Initialize the parent and distance vectors.
 
         for ( int i = 0; i < nV; i++ ) {
-            Parent[i] = -2;          // Parent of each vertex is unknown
+            Parent[i] = -1;          // Parent of each vertex is unknown
             Distance[i] = 2147483647; // We dont know the distance of the vertex from the Source vertex so the distance of each vertex be at infinite distance
         }
 
@@ -71,7 +71,7 @@ class Graph {
         // Q.front() : returns the element which is at the top of the queue
         // Enqueue the Source vertex to the Queue
 
-        std::vector<int> Visited(nE);
+        std::vector<int> Visited(nV, 0);
 
         Q.push(Source - 1);
         while ( !Q.empty() ) {
@@ -395,11 +395,11 @@ class Graph {
 };
 
 int main () {
-    Graph * graph = new Graph(4,4);
-    // graph->printAdjacencyList();
-    // graph->findShortestDistance(6, 5);
-    // graph->findNumberOfComponents();
-    // graph->checkCycle();
+    Graph * graph = new Graph(6,4);
+    graph->printAdjacencyList();
+    graph->findShortestDistance(2 , 4);
+    graph->findNumberOfComponents();
+    graph->checkCycle();
     graph->checkCycle_Undirected();
     return 0;
 } 
