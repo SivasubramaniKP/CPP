@@ -10,17 +10,16 @@ class DisjointSet {
     int nodes;
     DisjointSet(int nodes) {
         this->nodes = nodes;
-        Parent.resize(nodes);
+        Parent.resize(nodes + 1);
         for ( int i = 0 ; i < nodes; i++ ) {
             Parent[i] = i;
         }
     }
     int find( int u ) {
         if ( Parent[u] != u ) {
-            find(Parent[u]);
-        } else {
-            return u;
-        }
+            Parent[u] = find(Parent[u]);
+        } 
+         return Parent[u];
     }   
     void Union ( int u, int v ) {
         if ( find(u) != find(v) ) {
@@ -121,15 +120,15 @@ class Graph {
         int resWeight = 0; // Cost of MCST
         int nTreeEdge = 0; // nTreeEdges should be equal to nV - 1 for MCST
         int i = 0;
-        DisjointSet * set = new DisjointSet(nV); // Define a Disjoint set to detect cycles
+        DisjointSet * set = new DisjointSet(nV + 1); // Define a Disjoint set to detect cycles
         while ( nTreeEdge != nV - 1 ) {
             Edge temp = Edges[i++]; // Choose the edge with least weight
 
             // Vertex under the same component of Disjoint Set forms cycle
             // Ensure that source and destination is not in the same component
-            if ( set->find(temp.source - 1) != set->find(temp.destination - 1) ) {
+            if ( set->find(temp.source) != set->find(temp.destination) ) {
                 result.push_back(temp); // Add the edge to the tree
-                set->Union(temp.source - 1, temp.destination - 1); // Union operation to include the new vertex to the component
+                set->Union(temp.source, temp.destination); // Union operation to include the new vertex to the component
                 resWeight += temp.weight;
                 nTreeEdge++;
             }

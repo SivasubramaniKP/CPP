@@ -78,7 +78,7 @@ class Graph {
             } 
         }
 
-        for ( int i = 1 ; i <= nV; i++ ) {
+        for ( int i = 0 ; i < nV; i++ ) {
             std::cout << "distance from " << source << " to " << i << " " << dist[i] << "\n";
         }
     } 
@@ -86,9 +86,8 @@ class Graph {
 };
 
 int main () {
-    Graph * graph = new Graph(5, 7);
+    Graph * graph = new Graph(9, 14);
     graph->inputGraph();
-    graph->printGraph();
-    graph->Dijkstra(1);
+    graph->Dijkstra(0);
     return 0;
 }
