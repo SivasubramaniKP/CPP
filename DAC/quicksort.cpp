@@ -1,41 +1,24 @@
-#include <bits/stdc++.h>
-using namespace std;
+#include<iostream>
+#include <vector>
 
-// Partition function to place the pivot at the correct position
-int partition(vector<int>& arr, int low, int high) {
-    int pivot = arr[high]; // Choosing the last element as pivot
-    int i = low - 1; // Index for smaller elements
-
-    for (int j = low; j < high; j++) {
-        if (arr[j] < pivot) {
-            i++;
-            swap(arr[i], arr[j]);
-        }
+void partition(std::vector<int> arr, int low, int high) {
+    int left = low + 1;
+    int right = high;
+    int pivot = ( low == 0 ) ? arr[0] : arr[low - 1];
+    while (left < right) {
+        while ( left < right && arr[left] < pivot ) left+=1;
+        while ( right > left && arr[right] > pivot ) right -= 1;
+        int temp = arr[left];
+        arr[left] = arr[right];
+        arr[right] = temp;
+        left+=1;
+        right-=1;
     }
-    swap(arr[i + 1], arr[high]); // Move pivot to correct position
-    return i + 1; // Return pivot index
+
 }
 
-// QuickSort function
-void quickSort(vector<int>& arr, int low, int high) {
-    if (low < high) {
-        int pi = partition(arr, low, high); // Get pivot index
-        quickSort(arr, low, pi - 1); // Sort left subarray
-        quickSort(arr, pi + 1, high); // Sort right subarray
-    }
-}
-
-int main() {
-    vector<int> arr = {10, 7, 8, 9, 1, 5};
-    int n = arr.size();
-
-    quickSort(arr, 0, n - 1);
-
-    cout << "Sorted array: ";
-    for (int num : arr) {
-        cout << num << " ";
-    }
-    cout << endl;
-    
+int main () {
+    std::vector<int> a = {5, -4, 6, 0, -7, 1, 3, 11, 2};
+    partition(a, 0, a.size() - 1);
     return 0;
 }

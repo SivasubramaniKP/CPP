@@ -2,7 +2,7 @@
 using namespace std;
 
 // Merging two sorted subarrays
-void merge(vector<int>& arr, int left, int mid, int right) {
+void Merge(vector<int>& arr, int left, int mid, int right) {
     int n1 = mid - left + 1;
     int n2 = right - mid;
 
@@ -28,16 +28,17 @@ void merge(vector<int>& arr, int left, int mid, int right) {
         arr[k++] = L[i++];
     while (j < n2)
         arr[k++] = R[j++];
+    
 }
 
 // Merge Sort function
-void mergeSort(vector<int>& arr, int left, int right) {
+void MergeSort(vector<int>& arr, int left, int right) {
     if (left < right) {
         int mid = left + (right - left) / 2;
 
-        mergeSort(arr, left, mid);      // Sort left half
-        mergeSort(arr, mid + 1, right); // Sort right half
-        merge(arr, left, mid, right);   // Merge both halves
+        MergeSort(arr, left, mid);      // Sort left half
+        MergeSort(arr, mid + 1, right); // Sort right half
+        Merge(arr, left, mid, right);   // Merge both halves
     }
 }
 
@@ -45,12 +46,12 @@ int main() {
     vector<int> arr = {12, 11, 13, 5, 6, 7};
     int n = arr.size();
 
-    mergeSort(arr, 0, n - 1);
+    MergeSort(arr, 0, n - 1);
 
     cout << "Sorted array: ";
     for (int num : arr)
         cout << num << " ";
     cout << endl;
-
+    std::printf("This is the new print statement");
     return 0;
 }
