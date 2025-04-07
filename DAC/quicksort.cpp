@@ -1,24 +1,44 @@
 #include<iostream>
 #include <vector>
+#include <algorithm>
 
-void partition(std::vector<int> arr, int low, int high) {
-    int left = low + 1;
-    int right = high;
-    int pivot = ( low == 0 ) ? arr[0] : arr[low - 1];
-    while (left < right) {
-        while ( left < right && arr[left] < pivot ) left+=1;
-        while ( right > left && arr[right] > pivot ) right -= 1;
-        int temp = arr[left];
-        arr[left] = arr[right];
-        arr[right] = temp;
-        left+=1;
-        right-=1;
+int partition(std::vector<int> &arr, int low, int high) {
+        int pivot = arr[low];
+        int l = low - 1;
+        int r = high + 1;
+
+        while (true) {
+            do {
+                l++;
+            }while(arr[l] < pivot);
+            do {
+                r -= 1;
+
+            } while ( arr[r] > pivot );
+            if ( l >= r ) return r;
+            std::swap(arr[l], arr[r]);
+        }
+
+        std::swap(arr[low], arr[r]);
+}
+
+void quickSort(std::vector<int> &arr, int low, int high) {
+   if ( low < high ) {
+        int p = partition(arr, low, high);
+        quickSort(arr, low, p);
+        quickSort(arr, p + 1, high); 
     }
-
+}
+void printArray(const std::vector<int>& arr) {
+    for (int num : arr)
+        std::cout << num << " ";
+    std::cout << "\n";
 }
 
 int main () {
     std::vector<int> a = {5, -4, 6, 0, -7, 1, 3, 11, 2};
-    partition(a, 0, a.size() - 1);
+    printArray(a);
+    quickSort(a, 0, a.size() - 1);
+    printArray(a);
     return 0;
 }
