@@ -58,6 +58,7 @@ public class knapsack {
             if ( accept.upperBound > refuse.upperBound ) batman = accept;
             else batman = refuse;
 
+
             level += 1;
         }
         return batman.curProfit;
