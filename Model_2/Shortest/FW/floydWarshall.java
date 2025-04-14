@@ -1,7 +1,9 @@
 package Model_2.Shortest.FW;
 
+import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.ThreadPoolExecutor.DiscardOldestPolicy;
 
 class Edge {
     int source;
@@ -46,31 +48,29 @@ class Graph {
         }
     } 
     void floydWarshall () {
-        int W[][][] = new int[nV][nV][nV];
-        for ( int i = 0; i < nV; i++ ) {
-            for( int j = 0; j < nV; j++ ) {
-                W[0][i][j] = Integer.MAX_VALUE;    
-                if ( i == j ) W[0][i][j] = 0;
+        int [][] dist = new int[nV][nV];
+        for ( int i = 0 ; i < nV; i++ ) {
+            for ( int j = 0 ; j < nV; j++ ) {
+                if ( i == j ) dist[i][j] = 0;
+                else dist[i][j] = Integer.MAX_VALUE;
             }
         }
 
         for ( Edge e : List ) {
-            W[0][e.source][e.destination] = e.weight;    
+            dist[e.source][e.destination] = e.weight;
         }
-        printMatrix(W[0]);
-        for ( int k = 1; k < nV; k++ ) {
-            for ( int i = 0 ; i < nV; i++ ) {
-                for ( int j = 0 ; j < nV; j++ ) {
-                    if (W[k-1][i][k] != Integer.MAX_VALUE ||W[k-1][k][j] != Integer.MAX_VALUE ) {
-                        W[k][i][j] = Math.min(W[k-1][i][j], W[k-1][i][k] + W[k-1][k][j]);
-                    } else {
-                        W[k][i][j] = W[k-1][i][j];
-                    }
+
+        for ( int k = 0 ; k < nV; k++ ) {
+            for( int i = 0; i < nV; i++ ) {
+                for ( int  j = 0 ; j < nV; j++ ) {
+                    if ( dist[i][k] != Integer.MAX_VALUE && dist[k][j] != Integer.MAX_VALUE ) {
+                        dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+                    } 
                 }
             }
-            printMatrix(W[k]);
         }
-    }
+        printMatrix(dist);
+    } 
 }
 
 
