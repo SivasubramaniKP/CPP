@@ -7,7 +7,6 @@ class DisjointSet {
     public:
     int n;
     std::vector<int> arr;
-
     DisjointSet ( int n ) {
         this->n = n;
         arr.resize(n, 0);

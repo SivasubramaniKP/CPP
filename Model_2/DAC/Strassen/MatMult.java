@@ -101,18 +101,17 @@ public class MatMult {
     // Main
     public static void main(String[] args) {
         int[][] A = {
-            {1, 2},
-            {3, 4}
+            {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, { 0, 0, 0, 0 }
         };
 
         int[][] B = {
-            {5, 6},
-            {7, 8}
+            {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, { 0, 0, 0, 0 }
         };
 
         int[][] C = strassen(A, B);
 
         System.out.println("Product of A and B:");
         printMatrix(C);
+        
     }
 }

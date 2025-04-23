@@ -11,10 +11,16 @@ public class quickSort2 {
         while ( true ) {
            while ( l <= r && a[l] < pivot ) l += 1;
            while ( r >= l && a[r] > pivot ) r -= 1;
-            if ( true ) {
-                System.out.println("hello");
-            }
+            if ( l > r ) break; 
+            int temp  = a[l];
+            a[l] = a[r];
+            a[r] = temp;
         } 
+
+        int temp = a[low];
+        a[low] = a[r];
+        a[r] = temp;
+        return r;
     }
 
     static void quickSort(int a[], int low, int high) {

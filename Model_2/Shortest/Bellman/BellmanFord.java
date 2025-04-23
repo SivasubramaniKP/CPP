@@ -1,9 +1,8 @@
 package Model_2.Shortest.Bellman;
 
-import java.security.IdentityScope;
 import java.util.ArrayList;
 import java.util.Scanner;
-
+import java.util.*;
 class Edge {
     int source;
     int destination;
@@ -18,18 +17,16 @@ class Edge {
 
 class Graph {
     int nE;
-    ArrayList<Integer> Parent;
+    int [] Parent;
     int nV;
     ArrayList<Edge> List;
     Scanner sc = new Scanner(System.in)    ;
     Graph(int nE, int nV) {
         List = new ArrayList<>();
-        Parent = new ArrayList<>();
         this.nE = nE;
         this.nV = nV;
-        for( int i =0 ; i < nV; i++ ) {
-            Parent.add(-1);
-        }
+        Parent = new int[nV];
+        Arrays.fill(Parent, -1);
     }
 
 
@@ -42,6 +39,23 @@ class Graph {
         }
     }
 
+    ArrayList<Integer> constructPath(int source, int destination) {
+        ArrayList<Integer> path = new ArrayList<>();
+        if (Parent[destination] == -1 && destination != source) {
+            return path; // No path exists
+        }
+        
+        // Backtrack from destination to source
+        for (int v = destination; v != -1; v = Parent[v]) {
+            path.add(v);
+            if (v == source) break;
+        }
+        
+        // Reverse to get source to destination order
+        Collections.reverse(path);
+        return path;
+    }
+
     void BellmanFord(int source) {
         int Dist[] = new int[nV];
         for ( int i = 0 ; i < nV ; i++ ) Dist[i] = Integer.MAX_VALUE;
@@ -50,13 +64,28 @@ class Graph {
             for ( Edge e : List ) {
                 if ( Dist[e.source] != Integer.MAX_VALUE && Dist[e.destination] > Dist[e.source] + e.weight ) {
                     Dist[e.destination] = Dist[e.source] + e.weight;
-                    Parent.set(e.destination, e.source);
+                    Parent[e.destination] = e.source;
                 }
             }
-            for( int temp = 0 ; temp < nV; temp ++ ) {
-                System.out.print(Dist[temp] + "  "  + Parent.get(temp) + "\t");
-            }
             System.out.println();
+        }
+
+         System.out.println("\nShortest paths from source " + source + ":");
+        for (int i = 0; i < nV; i++) {
+            if (i == source) continue;
+            
+            ArrayList<Integer> path = constructPath(source, i);
+            if (path.isEmpty()) {
+                System.out.println("No path from " + source + " to " + i);
+            } else {
+                System.out.print("Path to " + i + ": ");
+                for (int j = 0; j < path.size(); j++) {
+                    System.out.print(path.get(j));
+                    if (j < path.size() - 1) System.out.print(" -> ");
+                }
+                System.out.println(" (Distance: " + 
+                    (Dist[i] == Integer.MAX_VALUE ? "∞" : Dist[i]) + ")");
+            }
         }
     } 
 
